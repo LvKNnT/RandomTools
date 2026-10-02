@@ -1,0 +1,9 @@
+# User-provided source images and generated compressed files
+input/*
+!input/.gitkeep
+output/*
+!output/.gitkeep
+
+# Python cache files
+__pycache__/
+*.py[cod]
