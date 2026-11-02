@@ -6,7 +6,7 @@ A collection of small, focused utilities for everyday automation and file proces
 
 | Tool | What it does | Interface |
 | --- | --- | --- |
-| [AutoMailer](./AutoMailer/) | Creates personalized Gmail drafts from an HTML template and CSV data by controlling an existing Microsoft Edge session. | Browser automation |
+| [AutoMailer](./AutoMailer/) | Creates personalized Gmail drafts from an HTML template and CSV data through Edge on Windows or Chrome on macOS. | Browser automation |
 | [Image & GIF Compressor](./Compresser/) | Compresses and optionally resizes JPEG, PNG, WebP, and animated GIF files while preserving GIF animation and transparency. | Desktop GUI and CLI |
 
 ## Requirements
@@ -15,7 +15,7 @@ A collection of small, focused utilities for everyday automation and file proces
 - `pip` or Conda for dependency installation
 - Tool-specific dependencies described in each tool's README
 
-AutoMailer additionally requires Windows, Microsoft Edge, and access to Gmail. The image compressor uses Tkinter for its desktop interface; Tkinter is included with most standard Windows Python installations.
+AutoMailer additionally requires access to Gmail plus Microsoft Edge on Windows or Google Chrome on macOS. The image compressor uses Tkinter for its desktop interface; Tkinter is included with many standard Python installations.
 
 ## Quick start
 
@@ -29,7 +29,15 @@ python -m pip install --upgrade selenium
 python .\send_mail.py
 ```
 
-Before running it, configure the subject and input paths in `send_mail.py`, then start Edge with remote debugging enabled and open Gmail. See the [AutoMailer guide](./AutoMailer/README.md) for the required HTML template and CSV formats, browser setup, safety notes, and troubleshooting.
+On macOS, run the Chrome version instead:
+
+```bash
+cd AutoMailer
+python3 -m pip install --upgrade selenium
+python3 ./send_mail_macos.py
+```
+
+Before running either version, configure the subject and input paths in the platform script, start its browser with remote debugging enabled, and open Gmail. See the [AutoMailer guide](./AutoMailer/README.md) for the required HTML template and CSV formats, Windows and macOS browser setup, safety notes, and troubleshooting.
 
 AutoMailer creates drafts only; it does not send them. Always test with one recipient and review every generated draft.
 
@@ -55,7 +63,8 @@ See the [compressor guide](./Compresser/README.md) for all supported formats and
 RandomTools/
 ├── AutoMailer/
 │   ├── README.md
-│   └── send_mail.py
+│   ├── send_mail.py
+│   └── send_mail_macos.py
 ├── Compresser/
 │   ├── input/
 │   ├── output/

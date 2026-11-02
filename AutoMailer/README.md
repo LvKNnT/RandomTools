@@ -1,6 +1,11 @@
 # AutoMailer
 
-AutoMailer creates personalized **Gmail drafts** from an HTML template and a CSV file. It attaches to an existing Microsoft Edge session through the browser's remote-debugging interface, fills each draft in the Gmail web interface, and leaves every message in Drafts for review.
+AutoMailer creates personalized **Gmail drafts** from an HTML template and a CSV file. It attaches to an existing browser session through the remote-debugging interface, fills each draft in the Gmail web interface, and leaves every message in Drafts for review.
+
+Two platform versions are included:
+
+- `send_mail.py`: Windows with Microsoft Edge.
+- `send_mail_macos.py`: macOS with Google Chrome.
 
 > AutoMailer does not click **Send**. Review the generated drafts before sending them manually.
 
@@ -15,23 +20,26 @@ AutoMailer creates personalized **Gmail drafts** from an HTML template and a CSV
 
 ## Requirements
 
-- Windows
 - Python 3.9 or later
-- Microsoft Edge
-- A Gmail account accessible in Edge
 - Selenium 4
+- A Gmail account accessible in the selected browser
+
+| Platform | Browser | Script |
+| --- | --- | --- |
+| Windows | Microsoft Edge | `send_mail.py` |
+| macOS | Google Chrome | `send_mail_macos.py` |
 
 Install the Python dependency:
 
-```powershell
+```text
 python -m pip install --upgrade selenium
 ```
 
-Recent Selenium releases can usually obtain a compatible Edge WebDriver through Selenium Manager. If driver discovery fails, install a Microsoft Edge WebDriver version compatible with your Edge version and add it to `PATH`.
+On macOS, use `python3` instead of `python` if that is how Python is installed. Recent Selenium releases can usually obtain a compatible Edge or Chrome driver through Selenium Manager. If driver discovery fails, install a WebDriver compatible with your browser and add it to `PATH`.
 
 ## Input files
 
-AutoMailer uses two input files. Their paths are configured near the top of `send_mail.py`:
+AutoMailer uses two input files. Their paths are configured near the top of the platform script you run:
 
 ```python
 SUBJECT = "Your email subject"
@@ -65,6 +73,8 @@ For the example above, the required headers are `Email`, `Name`, `Event`, and `R
 
 ## Usage
 
+### Windows and Microsoft Edge
+
 1. Update `SUBJECT`, `HTML_TEMPLATE_PATH`, and `CSV_DATA_PATH` in `send_mail.py`.
 2. Close any Edge instance that is already using the debug profile you plan to use.
 3. Press <kbd>Win</kbd>+<kbd>R</kbd> and launch Edge with remote debugging enabled:
@@ -81,6 +91,28 @@ For the example above, the required headers are `Email`, `Name`, `Event`, and `R
    ```
 
 6. Check the validation report in the terminal. Draft creation begins only if all required columns are present.
+7. Review the resulting messages in Gmail's **Drafts** folder before sending them.
+
+### macOS and Google Chrome
+
+1. Update `SUBJECT`, `HTML_TEMPLATE_PATH`, and `CSV_DATA_PATH` in `send_mail_macos.py`.
+2. Quit any Chrome instance already using the debug profile shown below.
+3. Open Terminal and launch a separate Chrome instance with remote debugging enabled:
+
+   ```bash
+   open -na "Google Chrome" --args \
+     --remote-debugging-port=9222 \
+     --user-data-dir="$HOME/.automailer-chrome-profile"
+   ```
+
+4. In that Chrome window, open Gmail, sign in, select the correct account or delegated mailbox, and leave the Gmail tab active.
+5. From the AutoMailer directory, run:
+
+   ```bash
+   python3 ./send_mail_macos.py
+   ```
+
+6. Check the validation report in Terminal. Draft creation begins only if all required columns are present.
 7. Review the resulting messages in Gmail's **Drafts** folder before sending them.
 
 Start with a CSV containing one test recipient. Running the script again creates another set of drafts; it does not detect or remove duplicates.
@@ -102,10 +134,11 @@ If automation fails while processing a row, the script reports the error and sto
 
 ### `Failed to connect`
 
-- Confirm Edge was started with `--remote-debugging-port=9222`.
+- Confirm Edge or Chrome was started with `--remote-debugging-port=9222`.
 - Confirm no other process is using port `9222`.
-- Use the dedicated debug profile from the launch command, not a normal Edge profile that is already open.
-- Confirm Selenium or `msedgedriver` is compatible with the installed Edge version.
+- Use the dedicated debug profile from the platform launch command, not a normal browser profile that is already open.
+- On Windows, confirm Selenium or `msedgedriver` is compatible with Edge.
+- On macOS, confirm Selenium or `chromedriver` is compatible with Chrome.
 
 ### A required column is missing
 
@@ -113,7 +146,7 @@ Every `{{placeholder}}` in the HTML must have an exact, case-sensitive CSV heade
 
 ### Clipboard access is blocked
 
-Keep the Gmail tab active and allow clipboard access if Edge asks. Browser or organization policies can prevent the Clipboard API from writing rich HTML.
+Keep the Gmail tab active and allow clipboard access if the browser asks. Browser or organization policies can prevent the Clipboard API from writing rich HTML.
 
 ### Gmail fields are not filled correctly
 
@@ -125,7 +158,7 @@ Open the HTML template directly in a browser to verify it first. Gmail may remov
 
 ## Security notes
 
-- A browser remote-debugging port allows local software to control that browser session. Use a dedicated Edge profile and close the debug browser when finished.
+- A browser remote-debugging port allows local software to control that browser session. Use the dedicated profile shown in the platform instructions and close the debug browser when finished.
 - Treat recipient CSV files and generated drafts as sensitive data.
 - Do not place passwords, session cookies, or API keys in the script, template, or repository.
 - Verify the active Gmail account and every recipient before sending.
@@ -133,7 +166,7 @@ Open the HTML template directly in a browser to verify it first. Gmail may remov
 ## Limitations
 
 - Gmail only; the script is coupled to the Gmail web interface.
-- Microsoft Edge only.
+- Microsoft Edge on Windows or Google Chrome on macOS only.
 - Creates drafts sequentially and has no resume or deduplication support.
 - Does not validate email address syntax.
 - Stops at the first browser-automation error.
